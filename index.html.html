@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thalam Prototype Tester</title>
+    <style>
+        body {
+            background-color: #1a1a2e;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 400px;
+            background: #162447;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            border: 2px solid #ffb000;
+        }
+        h1 { color: #ffb000; margin-bottom: 10px; }
+        .btn {
+            background-color: #1db954;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 20px;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+        .btn:active { transform: scale(0.95); }
+        .reveal-btn { background-color: #ffb000; color: #1a1a2e; margin-top: 10px;}
+        .hidden-answer { display: none; margin-top: 20px; font-size: 24px; font-weight: bold; color: #00b4d8; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>THALAM (தாளம்)</h1>
+    <p>Prototype Scanning Terminal</p>
+    <hr style="border-color: #ffb000; margin: 20px 0;">
+    
+    <div id="app-body">
+        <p>Scanning card...</p>
+    </div>
+</div>
+
+<script>
+    // 2. YOUR TEST DATABASE
+    const songDatabase = {
+        "001": { 
+            title: "Chinna Chinna Asai", 
+            movie: "Roja", 
+            year: "1992", 
+            spotify: "https://open.spotify.com/track/3tG6VtrL3J8f6YvG1W8wKx" // Paste actual Spotify web links here
+        },
+        "002": { 
+            title: "Pachai Nirame", 
+            movie: "Alaipayuthey", 
+            year: "2000", 
+            spotify: "https://open.spotify.com/track/5E302UrK4vjG525q4SgHIR"
+        },
+        "003": { 
+            title: "Hukum", 
+            movie: "Jailer", 
+            year: "2023", 
+            spotify: "https://open.spotify.com/track/7wK1oW6wI4VbG525q4SgHI"
+        }
+    };
+
+    // Parse the Card ID from the URL (e.g., website.com/?id=002)
+    const urlParams = new URLSearchParams(window.location.search);
+    const cardId = urlParams.get('id');
+    const appBody = document.getElementById('app-body');
+
+    if (cardId && songDatabase[cardId]) {
+        const song = songDatabase[cardId];
+        
+        appBody.innerHTML = `
+            <p style="font-size: 18px;">Card <strong>#${cardId}</strong> successfully detected!</p>
+            
+            <!-- Opens Spotify directly -->
+            <a href="${song.spotify}" target="_blank" class="btn">🎵 PLAY TRACK NOW</a>
+            
+            <br><br>
+            
+            <!-- Reveal answers panel -->
+            <button class="btn reveal-btn" onclick="revealAnswer()">👀 REVEAL ANSWER</button>
+            <div id="answer" class="hidden-answer">
+                Year: ${song.year}<br>
+                <span style="font-size:16px; color:#fff;">${song.title} (${song.movie})</span>
+            </div>
+        `;
+    } else {
+        appBody.innerHTML = `<p style="color: #ff5555;">⚠️ No valid card detected. Make sure your URL ends with <strong>?id=001</strong></p>`;
+    }
+
+    function revealAnswer() {
+        document.getElementById('answer').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>

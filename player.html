@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thalam - Controller</title>
+    <!-- Lightweight HTML5 QR Code Scanner Library -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <style>
+        body { background: #162447; color: #fff; font-family: sans-serif; text-align: center; padding: 20px; margin: 0; }
+        .card { background: #1a1a2e; border: 2px solid #ffb000; padding: 20px; border-radius: 12px; margin-top: 10px; }
+        input { padding: 12px; font-size: 16px; border-radius: 6px; border: none; width: 80%; margin-bottom: 15px; }
+        button { background: #ffb000; color: #162447; font-weight: bold; padding: 12px 24px; border: none; border-radius: 20px; font-size: 18px; cursor: pointer; }
+        .hidden { display: none; }
+        #reader { width: 100%; margin-top: 15px; border-radius: 10px; overflow: hidden; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2 style="color: #ffb000; margin-top: 0;">THALAM (தாளம்)</h2>
+
+        <!-- STEP 1: USERNAME ENTRY -->
+        <div id="join-screen">
+            <p>Enter nickname to join main stage:</p>
+            <input type="text" id="username" placeholder="Name" maxlength="12">
+            <br>
+            <button onclick="joinLobby()">JOIN ROOM</button>
+        </div>
+
+        <!-- STEP 2: SCANNER & CONTROLLER -->
+        <div id="game-screen" class="hidden">
+            <p>Welcome, <strong id="player-name-display" style="color:#00b4d8;"></strong>!</p>
+            
+            <button onclick="startScanner()" style="background:#1db954; color:#fff;">📷 SCAN PHYSICAL CARD</button>
+            
+            <div id="reader"></div>
+
+            <hr style="border-color: #333; margin: 20px 0;">
+            
+            <button style="background-color: #e63946; color: white;">THALAM BLOCK!</button>
+        </div>
+    </div>
+
+<script>
+    function joinLobby() {
+        const name = document.getElementById('username').value.trim();
+        if(!name) return alert("Please enter a username!");
+
+        document.getElementById('player-name-display').innerText = name;
+        document.getElementById('join-screen').classList.add('hidden');
+        document.getElementById('game-screen').classList.remove('hidden');
+
+        // Broadcast join event to host screen
+        localStorage.setItem('thalam_new_player', name + '_' + Date.now());
+    }
+
+    function startScanner() {
+        const html5QrCode = new Html5Qrcode("reader");
+        html5QrCode.start(
+            { facingMode: "environment" }, 
+            { fps: 10, qrbox: { width: 250, height: 250 } },
+            (decodedText) => {
+                // Extracts card ID from QR text (e.g. "001" or "thalam.party/?id=001")
+                const cardId = decodedText.includes('id=') ? decodedText.split('id=')[1] : decodedText;
+                
+                // Signal Host Screen to play audio automatically
+                localStorage.setItem('thalam_scanned_card', cardId + '_' + Date.now());
+                
+                alert("Card #" + cardId + " Scanned! Playing audio on main stage...");
+                html5QrCode.stop();
+            },
+            (errorMessage) => { /* ignore scanning frame errors */ }
+        );
+    }
+</script>
+</body>
+</html>
